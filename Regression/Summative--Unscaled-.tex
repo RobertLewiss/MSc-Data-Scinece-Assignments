@@ -1,0 +1,1523 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{lmodern}
+\usepackage{amsmath}
+\usepackage{ifxetex,ifluatex}
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+  \usepackage{amssymb}
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  pdftitle={Assignment for ASML (Submodule Regression) Epiphany 2021},
+  pdfauthor={Put your anonymous Z code here},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifluatex
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+
+\title{Assignment for ASML (Submodule Regression) Epiphany 2021}
+\author{Put your anonymous Z code here}
+\date{}
+
+\begin{document}
+\maketitle
+
+\hypertarget{general-instructions}{%
+\section{General Instructions}\label{general-instructions}}
+
+Please go through the R notebook below, and carry out the requested
+tasks. You will provide all your answers directly into this .Rmd file.
+Add code into the R chunks where requested. You can create new chunks
+where required. Where text answers are requested, please add them
+directly into this document, typically below the R chunks, using R
+Markdown syntax as appropriate.
+
+At the end, you will submit only your `knitted' PDF version of the
+notebook, through Tunitin on DUO, but not the .Rmd file itself.
+
+\textbf{Important notes}:
+
+\begin{itemize}
+\item
+  Please ensure carefully that all chunks compile, and also check in the
+  knitted PDF whether all R chunks did \emph{actually} compile, and all
+  images and outputs that you would like to produce have \emph{actually}
+  been generated. \textbf{A picture or a piece of R output which does
+  not exist will give zero marks, even if some parts of the underlying R
+  code would have been correct.}
+\item
+  Some of the requested analyses requires running R code which is not
+  deterministic. So, you will not have full control over the output that
+  is finally generated in the knitted document. This is fine. It is
+  clear that the methods under investigation carry uncertainty, which is
+  actually part of the problem tackled in this assignment. Your analysis
+  should, however, be robust enough so that it stays in essence correct
+  under repeated execution of your data analysis.
+\item
+  We consider a large data set! So, some calculations may take a while,
+  and you will need to be patient. Where code contains loops, it may be
+  a good idea to print the iteration number on the screen so that you
+  know how far the computation has progressed. However, computations
+  should usually not take more than a few minutes, even on an old
+  laptop. So, if a certain computation takes too long, then change your
+  code or methodology, rather than letting your computer struggle for
+  hours!
+\end{itemize}
+
+\hypertarget{preliminaries}{%
+\section{Preliminaries}\label{preliminaries}}
+
+We investigate a dataset introduced in a publication in \emph{Nature} by
+\href{https://www.researchgate.net/publication/12638392_Distinct_types_of_diffuse_large_B-cell_lymphoma_identified_by_gene_expression_profiling}{Alizadeh
+(2000)}. This dataset reports gene expression profiles (7399 genes) of
+240 patients with B-cell Lymphoma (a tumor that developes from B
+lymphocytes). The response variable corresponds to patient survival
+times (in years). So, this is a truly high-dimensional regression
+problem, with \(p=7399\) predictor variables, but only \(n=240\)
+observations.
+
+Please use the following steps to read in the data (you may need to
+install R package \texttt{HCmodelSets} first).
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{require}\NormalTok{(HCmodelSets)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Loading required package: HCmodelSets
+\end{verbatim}
+
+\begin{verbatim}
+## Loading required package: mvtnorm
+\end{verbatim}
+
+\begin{verbatim}
+## Loading required package: ggplot2
+\end{verbatim}
+
+\begin{verbatim}
+## Loading required package: survival
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{data}\NormalTok{(LymphomaData)}
+\NormalTok{?patient.data}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## starting httpd help server ...
+\end{verbatim}
+
+\begin{verbatim}
+##  done
+\end{verbatim}
+
+A few initial steps need to be carried out to prepare the data for
+analysis. Executing
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{names}\NormalTok{(patient.data)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "x"      "time"   "status"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{dim}\NormalTok{(patient.data}\SpecialCharTok{$}\NormalTok{x)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 7399  240
+\end{verbatim}
+
+will tell you that the matrix of predictors is given in the wrong
+orientation for our purposes. So, let's define
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{X }\OtherTok{\textless{}{-}} \FunctionTok{t}\NormalTok{(patient.data}\SpecialCharTok{$}\NormalTok{x)}
+\FunctionTok{colnames}\NormalTok{(X) }\OtherTok{\textless{}{-}}\FunctionTok{paste}\NormalTok{(}\StringTok{"G"}\NormalTok{, }\DecValTok{1}\SpecialCharTok{:}\FunctionTok{dim}\NormalTok{(X)[}\DecValTok{2}\NormalTok{], }\AttributeTok{sep=}\StringTok{""}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+Now, we define the response variable as
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Time }\OtherTok{\textless{}{-}}\NormalTok{ patient.data}\SpecialCharTok{$}\NormalTok{time}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{task-1-exploratory-data-analysis-10-marks}{%
+\section{Task 1: Exploratory data analysis (10
+marks)}\label{task-1-exploratory-data-analysis-10-marks}}
+
+Using appropriate graphical tools, carry out some exploratory analysis
+in order to get a better understanding of the data. For instance, it
+could be useful to provide a histogram of the response, and a scree plot
+for a principal component analysis of the predictor space. Additional
+contributions which are more creative than that are welcome. No
+explanations or comments are required in this task.
+
+\textbf{Answer:}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# ...}
+
+\StringTok{"Exploring the response variable"}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "Exploring the response variable"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#Histogram of response}
+\FunctionTok{hist}\NormalTok{(Time) }
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Summative--Unscaled-_files/figure-latex/unnamed-chunk-5-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#Mean}
+\StringTok{"Mean Time"}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "Mean Time"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{mean}\NormalTok{(Time)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 5.410833
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\StringTok{"STD of Time"}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "STD of Time"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sd}\NormalTok{(Time)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 4.392515
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\StringTok{"sample quantiles of Time"}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "sample quantiles of Time"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{quantile}\NormalTok{(Time)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   0%  25%  50%  75% 100% 
+##  1.0  1.9  3.8  8.1 22.8
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\StringTok{"Number of missing values in Time"}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "Number of missing values in Time"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sum}\NormalTok{(}\FunctionTok{is.na}\NormalTok{(Time))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\StringTok{"Exploring the Genes (X) variable, Cant explore all as so many so use a random sample of 9 genes"}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "Exploring the Genes (X) variable, Cant explore all as so many so use a random sample of 9 genes"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\StringTok{""}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] ""
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{xxx }\OtherTok{\textless{}{-}} \DecValTok{1}\SpecialCharTok{:}\DecValTok{7399}
+\NormalTok{ind}\OtherTok{\textless{}{-}}\FunctionTok{c}\NormalTok{(}\FunctionTok{sample}\NormalTok{(xxx,}\DecValTok{9}\NormalTok{))}
+\NormalTok{DataExplorer}\SpecialCharTok{::}\FunctionTok{plot\_histogram}\NormalTok{(X[,ind], }\AttributeTok{ncol =} \DecValTok{3}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Summative--Unscaled-_files/figure-latex/unnamed-chunk-6-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#Mean}
+\StringTok{"Mean X"}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "Mean X"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{colMeans}\NormalTok{(X[,ind])}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##        G2612        G1701        G5490        G3307        G1587        G2832 
+##  0.003308458 -0.043666917  0.031169479  0.028672583 -0.094518062 -0.122438417 
+##        G3359        G3139        G7101 
+##  0.037848979 -0.045407083 -0.032076167
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\StringTok{"STD of X"}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "STD of X"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{apply}\NormalTok{(X[,ind],}\DecValTok{2}\NormalTok{,sd)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##     G2612     G1701     G5490     G3307     G1587     G2832     G3359     G3139 
+## 0.6589489 0.5142093 0.6624627 1.1512563 0.6415284 0.9923284 0.5998175 0.5514359 
+##     G7101 
+## 0.6437275
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\StringTok{"sample quantiles of X"}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "sample quantiles of X"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{apply}\NormalTok{(X[,ind],}\DecValTok{2}\NormalTok{,quantile)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##          G2612     G1701      G5490     G3307         G1587     G2832
+## 0%   -1.494000 -1.279000 -2.0460000 -4.729000 -3.1110000000 -3.545000
+## 25%  -0.376175 -0.407325 -0.3199625 -0.664475 -0.4369000000 -0.713825
+## 50%  -0.020650 -0.023500  0.0184500  0.056350 -0.0003999975  0.040050
+## 75%   0.352750  0.260500  0.5234750  0.744500  0.3267250000  0.572200
+## 100%  2.683000  1.345000  1.7140000  4.245000  1.2170000000  2.256000
+##           G3359     G3139      G7101
+## 0%   -1.7260000 -2.816000 -2.0380000
+## 25%  -0.3621500 -0.378925 -0.4043312
+## 50%  -0.0117125 -0.017555 -0.0381350
+## 75%   0.3962350  0.337475  0.3406100
+## 100%  2.0680000  1.222000  2.0190000
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\StringTok{"Number of missing values in X"}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "Number of missing values in X"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sum}\NormalTok{(}\FunctionTok{is.na}\NormalTok{(X[,ind]))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\StringTok{"Scree plot"}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "Scree plot"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{pc.cr }\OtherTok{\textless{}{-}} \FunctionTok{prcomp}\NormalTok{(X, }\AttributeTok{scale. =} \ConstantTok{TRUE}\NormalTok{)}
+\FunctionTok{screeplot}\NormalTok{(pc.cr, }\AttributeTok{npcs =} \DecValTok{8}\NormalTok{, }\AttributeTok{main =} \StringTok{"SCREE plot"}\NormalTok{,}\AttributeTok{type =} \StringTok{"lines"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Summative--Unscaled-_files/figure-latex/unnamed-chunk-7-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\StringTok{"Pairs plot of 3 random genes with time"}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "Pairs plot of 3 random genes with time"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{xxx }\OtherTok{\textless{}{-}} \DecValTok{1}\SpecialCharTok{:}\DecValTok{7399}
+\NormalTok{ind}\OtherTok{\textless{}{-}}\FunctionTok{c}\NormalTok{(}\FunctionTok{sample}\NormalTok{(xxx,}\DecValTok{3}\NormalTok{))}
+\NormalTok{A }\OtherTok{=} \FunctionTok{cbind}\NormalTok{(X[,ind], Time)}
+\FunctionTok{pairs}\NormalTok{(A)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Summative--Unscaled-_files/figure-latex/unnamed-chunk-8-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\StringTok{"Exploring the Status variable"}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "Exploring the Status variable"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\StringTok{"Counts of the status:"}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "Counts of the status:"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{table}\NormalTok{(patient.data}\SpecialCharTok{$}\NormalTok{status)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+##   0   1 
+## 102 138
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\StringTok{"NOTE I DID SCLAE THE DATA AND RUN THE CELLS BELOW, THE RESULTS DID NOT CHANGE THEREFORE i DID NOT USE SCALING IN THE END"}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "NOTE I DID SCLAE THE DATA AND RUN THE CELLS BELOW, THE RESULTS DID NOT CHANGE THEREFORE i DID NOT USE SCALING IN THE END"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Unscale }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(X,OG) \{}
+\NormalTok{  std }\OtherTok{\textless{}{-}} \FunctionTok{apply}\NormalTok{(OG, }\DecValTok{2}\NormalTok{, sd)}
+\NormalTok{  meen }\OtherTok{\textless{}{-}} \FunctionTok{colMeans}\NormalTok{(OG)}
+\NormalTok{  XX }\OtherTok{\textless{}{-}}\FunctionTok{sweep}\NormalTok{(X,}\DecValTok{2}\NormalTok{,std,}\StringTok{\textasciigrave{}}\AttributeTok{*}\StringTok{\textasciigrave{}}\NormalTok{)}
+\NormalTok{  scaled }\OtherTok{\textless{}{-}} \FunctionTok{sweep}\NormalTok{(XX, }\DecValTok{2}\NormalTok{, meen, }\StringTok{\textasciigrave{}}\AttributeTok{+}\StringTok{\textasciigrave{}}\NormalTok{)}
+  
+  \FunctionTok{return}\NormalTok{(scaled)}
+\NormalTok{\}}
+
+\NormalTok{Scale }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(X) \{}
+\NormalTok{  std }\OtherTok{\textless{}{-}} \FunctionTok{apply}\NormalTok{(X, }\DecValTok{2}\NormalTok{, sd)}
+\NormalTok{  meen }\OtherTok{\textless{}{-}} \FunctionTok{colMeans}\NormalTok{(X)}
+\NormalTok{  XX }\OtherTok{\textless{}{-}} \FunctionTok{sweep}\NormalTok{(X, }\DecValTok{2}\NormalTok{, meen, }\StringTok{\textasciigrave{}}\AttributeTok{{-}}\StringTok{\textasciigrave{}}\NormalTok{)}
+\NormalTok{  X }\OtherTok{\textless{}{-}}\FunctionTok{sweep}\NormalTok{(XX,}\DecValTok{2}\NormalTok{,std,}\StringTok{"/"}\NormalTok{)}
+  \FunctionTok{return}\NormalTok{(X)}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{task-2-the-lasso-18-marks}{%
+\section{Task 2: The Lasso (18 marks)}\label{task-2-the-lasso-18-marks}}
+
+We would like to reduce the dimension of the currently 7399-dimensional
+space of predictors. To this end, apply initially the (frequentist)
+LASSO onto this data set, using the R function \texttt{glmnet}. The
+outputs required are
+
+\begin{itemize}
+\tightlist
+\item
+  the trace plot of the fitted regression coefficients;
+\item
+  a graphical illustration of the cross-validation to find \(\lambda\).
+\end{itemize}
+
+Provide a short statement interpreting the plots.
+
+Then, extract and report the value of \(\lambda\) which \emph{minimizes}
+the cross-validation criterion. How many genes are included into the
+model according to this choice?
+
+\textbf{Answer:}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# ...}
+
+\FunctionTok{require}\NormalTok{(glmnet)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Loading required package: glmnet
+\end{verbatim}
+
+\begin{verbatim}
+## Loading required package: Matrix
+\end{verbatim}
+
+\begin{verbatim}
+## Loaded glmnet 4.1-1
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{gene.lasso}\OtherTok{\textless{}{-}} \FunctionTok{glmnet}\NormalTok{(X, Time, }\AttributeTok{family=}\StringTok{"gaussian"}\NormalTok{, }\AttributeTok{alpha=}\DecValTok{1}\NormalTok{)}
+\FunctionTok{par}\NormalTok{(}\AttributeTok{mar =} \FunctionTok{c}\NormalTok{(}\DecValTok{6}\NormalTok{,}\DecValTok{4}\NormalTok{,}\DecValTok{4}\NormalTok{,}\DecValTok{2}\NormalTok{))}
+\FunctionTok{plot}\NormalTok{(gene.lasso, }\AttributeTok{xvar=}\StringTok{"lambda"}\NormalTok{)}
+\FunctionTok{title}\NormalTok{(}\StringTok{"trace plot of the fitted regression coefficients"}\NormalTok{, }\AttributeTok{line =} \SpecialCharTok{+}\DecValTok{3}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Summative--Unscaled-_files/figure-latex/unnamed-chunk-11-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{gene.lasso.cv}\OtherTok{=} \FunctionTok{cv.glmnet}\NormalTok{(X, Time, }\AttributeTok{alpha=}\DecValTok{1}\NormalTok{ )}
+\FunctionTok{par}\NormalTok{(}\AttributeTok{mfrow=}\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{), }\AttributeTok{mai=}\FunctionTok{c}\NormalTok{(}\FloatTok{0.8}\NormalTok{,}\FloatTok{0.8}\NormalTok{,}\FloatTok{0.8}\NormalTok{,}\FloatTok{0.8}\NormalTok{), }\AttributeTok{cex.axis=}\DecValTok{2}\NormalTok{)}
+\FunctionTok{plot}\NormalTok{(gene.lasso.cv)}
+
+\FunctionTok{title}\NormalTok{(}\StringTok{"MSE againts log(lambda)"}\NormalTok{, }\AttributeTok{line =} \SpecialCharTok{+}\DecValTok{3}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Summative--Unscaled-_files/figure-latex/unnamed-chunk-12-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{gene.lasso.cv}\SpecialCharTok{$}\NormalTok{lambda.min}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0.6486778
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\StringTok{"Statement"}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "Statement"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\StringTok{""}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] ""
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\StringTok{"Firstly from the Trace plot we can clearly see as lamdba approaches zero the loss fucntion of the lasso tends to the OLS function. Therefore as lambda grows we get stonger reguilarisation}
+\StringTok{The lambda which *minimizes* the cross{-}validation criterion was a small {-}ve number (\textasciitilde{} {-}0.7 , dont wont to specify exact value as it changes slighly between runs) therefore we are using}
+\StringTok{a fairly strong regularisation.Hinting that we do not need many of these \textasciitilde{}7000 genes as there are a small subset of genes that seem to capture a most of the information. This is why we see }
+\StringTok{most of the coefficients tedning towards zero as we approach log(lambda) = 0.I.E most of the genes/features here are not useful/needed.}
+
+\StringTok{The MSE vs Lambda allows us to find the best lambda that minismises the MSE using cross validation. So overall we find the best lamda through minimising MSE through CV. We can interprete this result using the trace plot, as at this lamdba on the trace plot we can see how many coefficients are non zero i.e important coefficients that help us predict the response variable (Time). We can even get a rough idea of the magnitude of these coeficients.We can also see from the MSE vs Lambda graph that the number of params needed is roughly between 5{-}36"}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "Firstly from the Trace plot we can clearly see as lamdba approaches zero the loss fucntion of the lasso tends to the OLS function. Therefore as lambda grows we get stonger reguilarisation\nThe lambda which *minimizes* the cross-validation criterion was a small -ve number (~ -0.7 , dont wont to specify exact value as it changes slighly between runs) therefore we are using\na fairly strong regularisation.Hinting that we do not need many of these ~7000 genes as there are a small subset of genes that seem to capture a most of the information. This is why we see \nmost of the coefficients tedning towards zero as we approach log(lambda) = 0.I.E most of the genes/features here are not useful/needed.\n\nThe MSE vs Lambda allows us to find the best lambda that minismises the MSE using cross validation. So overall we find the best lamda through minimising MSE through CV. We can interprete this result using the trace plot, as at this lamdba on the trace plot we can see how many coefficients are non zero i.e important coefficients that help us predict the response variable (Time). We can even get a rough idea of the magnitude of these coeficients.We can also see from the MSE vs Lambda graph that the number of params needed is roughly between 5-36"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\StringTok{""}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] ""
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{gene.lasso.min\_lambda }\OtherTok{\textless{}{-}}\NormalTok{ gene.lasso.cv}\SpecialCharTok{$}\NormalTok{lambda.min}
+\StringTok{"lambda that minimises the cross{-}validation criterion"}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "lambda that minimises the cross-validation criterion"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{gene.lasso.min\_lambda}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0.6486778
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{gene.lasso.coef }\OtherTok{\textless{}{-}} \FunctionTok{coef}\NormalTok{(gene.lasso.cv, }\AttributeTok{s=}\StringTok{"lambda.min"}\NormalTok{)}
+\FunctionTok{apply}\NormalTok{(gene.lasso.coef, }\DecValTok{2}\NormalTok{, }\ControlFlowTok{function}\NormalTok{(c)}\FunctionTok{sum}\NormalTok{(c}\SpecialCharTok{!=}\DecValTok{0}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##  1 
+## 24
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sprintf}\NormalTok{(}\StringTok{"The number of parameters is = \%d"}\NormalTok{, }\FunctionTok{apply}\NormalTok{(gene.lasso.coef, }\DecValTok{2}\NormalTok{, }\ControlFlowTok{function}\NormalTok{(c)}\FunctionTok{sum}\NormalTok{(c}\SpecialCharTok{!=}\DecValTok{0}\NormalTok{)))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "The number of parameters is = 24"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\StringTok{"The names are:"}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "The names are:"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{as.vector}\NormalTok{(}\FunctionTok{rownames}\NormalTok{(gene.lasso.coef)[gene.lasso.coef[,}\DecValTok{1}\NormalTok{] }\SpecialCharTok{!=} \DecValTok{0}\NormalTok{])}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##  [1] "(Intercept)" "G1020"       "G1021"       "G1259"       "G1456"      
+##  [6] "G1825"       "G3395"       "G3807"       "G4131"       "G4248"      
+## [11] "G4762"       "G5053"       "G5352"       "G5476"       "G5608"      
+## [16] "G5621"       "G5950"       "G6014"       "G6134"       "G6321"      
+## [21] "G6365"       "G6508"       "G6757"       "G7070"
+\end{verbatim}
+
+\hypertarget{task-3-assessing-cross-validation-resampling-uncertainty-20-marks}{%
+\section{Task 3: Assessing cross-validation resampling uncertainty (20
+marks)}\label{task-3-assessing-cross-validation-resampling-uncertainty-20-marks}}
+
+We know that the output of the cross-validation routine is not
+deterministic. To shed further light on this, please carry out a simple
+experiment. Run the cross-validation and estimation routine for the
+(frequentist) LASSO 50 times, each time identifying the value of
+\(\lambda\) which minimizes the cross-validation criterion, and each
+time recording which predictor variables have been selected by the
+Lasso. When finished, produce a table which lists how often each
+variable has been included.
+
+Build a model which includes all variables which have been selected at
+least 25 (out of 50) times. Refit this model with the selected variables
+using ordinary least squares. (Benchmark: The value of \(R^2\) of this
+model should not be worse than about 0.45, and your model should not
+make use of more than ca 25 genes).
+
+Report the names of the selected genes (in terms of the notation defined
+in the \texttt{Preliminaries}) explicitly.
+
+\textbf{Answer:}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# ...}
+\NormalTok{lambda\_vals }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{()}
+
+\NormalTok{row\_names }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{()}
+
+
+\FunctionTok{require}\NormalTok{(glmnet)}
+\ControlFlowTok{for}\NormalTok{(i }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\DecValTok{50}\NormalTok{)\{}
+
+\NormalTok{  gene.lasso.cv}\OtherTok{=} \FunctionTok{cv.glmnet}\NormalTok{(X, Time, }\AttributeTok{alpha=}\DecValTok{1}\NormalTok{ )}
+  
+\NormalTok{  gene.lasso.min\_lambda }\OtherTok{\textless{}{-}}\NormalTok{ gene.lasso.cv}\SpecialCharTok{$}\NormalTok{lambda.min}
+\NormalTok{  lambda\_vals[i] }\OtherTok{\textless{}{-}}\NormalTok{ gene.lasso.min\_lambda}
+  
+\NormalTok{  gene.lasso.coef }\OtherTok{\textless{}{-}} \FunctionTok{coef}\NormalTok{(gene.lasso.cv, }\AttributeTok{s=}\StringTok{"lambda.min"}\NormalTok{)}
+\NormalTok{  z }\OtherTok{\textless{}{-}} \FunctionTok{as.vector}\NormalTok{(}\FunctionTok{rownames}\NormalTok{(gene.lasso.coef)[gene.lasso.coef[,}\DecValTok{1}\NormalTok{] }\SpecialCharTok{!=} \DecValTok{0}\NormalTok{])}
+\NormalTok{  row\_names }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(row\_names,z)}
+  \FunctionTok{print}\NormalTok{(i)}
+
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 1
+## [1] 2
+## [1] 3
+## [1] 4
+## [1] 5
+## [1] 6
+## [1] 7
+## [1] 8
+## [1] 9
+## [1] 10
+## [1] 11
+## [1] 12
+## [1] 13
+## [1] 14
+## [1] 15
+## [1] 16
+## [1] 17
+## [1] 18
+## [1] 19
+## [1] 20
+## [1] 21
+## [1] 22
+## [1] 23
+## [1] 24
+## [1] 25
+## [1] 26
+## [1] 27
+## [1] 28
+## [1] 29
+## [1] 30
+## [1] 31
+## [1] 32
+## [1] 33
+## [1] 34
+## [1] 35
+## [1] 36
+## [1] 37
+## [1] 38
+## [1] 39
+## [1] 40
+## [1] 41
+## [1] 42
+## [1] 43
+## [1] 44
+## [1] 45
+## [1] 46
+## [1] 47
+## [1] 48
+## [1] 49
+## [1] 50
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\StringTok{"All selected params"}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "All selected params"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{result}\OtherTok{\textless{}{-}} \FunctionTok{as.data.frame}\NormalTok{(}\FunctionTok{table}\NormalTok{(row\_names))}
+\NormalTok{result}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##      row_names Freq
+## 1  (Intercept)   50
+## 2        G1020   47
+## 3        G1021   26
+## 4        G1055    4
+## 5        G1259   18
+## 6        G1456   50
+## 7        G1825   50
+## 8        G2694    9
+## 9        G3395   46
+## 10       G3807   47
+## 11       G3820    2
+## 12       G4099    9
+## 13       G4131   50
+## 14       G4248   45
+## 15        G428    4
+## 16       G4421    1
+## 17       G4628    2
+## 18       G4648    1
+## 19       G4762   46
+## 20       G4887    1
+## 21       G5027    2
+## 22       G5053   18
+## 23       G5352   46
+## 24       G5476   18
+## 25       G5608   26
+## 26       G5621   47
+## 27       G5950   50
+## 28       G6014   26
+## 29       G6026    1
+## 30       G6134   46
+## 31       G6156    2
+## 32       G6321   47
+## 33       G6365   18
+## 34       G6508   18
+## 35       G6669    2
+## 36       G6672    2
+## 37       G6757   26
+## 38       G7018    4
+## 39       G7069    8
+## 40       G7070   48
+## 41       G7262    1
+## 42       G7357    9
+## 43       G7380    9
+## 44         G80    1
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\StringTok{""}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] ""
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\StringTok{"All Params with counts \textgreater{}= 25"}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "All Params with counts >= 25"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{data }\OtherTok{\textless{}{-}}\NormalTok{ result[result[,}\DecValTok{2}\NormalTok{] }\SpecialCharTok{\textgreater{}=} \DecValTok{25}\NormalTok{,] }
+\NormalTok{data}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##      row_names Freq
+## 1  (Intercept)   50
+## 2        G1020   47
+## 3        G1021   26
+## 6        G1456   50
+## 7        G1825   50
+## 9        G3395   46
+## 10       G3807   47
+## 13       G4131   50
+## 14       G4248   45
+## 19       G4762   46
+## 23       G5352   46
+## 25       G5608   26
+## 26       G5621   47
+## 27       G5950   50
+## 28       G6014   26
+## 30       G6134   46
+## 32       G6321   47
+## 37       G6757   26
+## 40       G7070   48
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Selected\_var }\OtherTok{\textless{}{-}} \FunctionTok{as.vector}\NormalTok{(data[,}\DecValTok{1}\NormalTok{])}
+
+
+\NormalTok{b }\OtherTok{\textless{}{-}} \FunctionTok{paste}\NormalTok{(Selected\_var[}\SpecialCharTok{{-}}\DecValTok{1}\NormalTok{], }\AttributeTok{collapse=}\StringTok{"+"}\NormalTok{)}
+\NormalTok{b}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "G1020+G1021+G1456+G1825+G3395+G3807+G4131+G4248+G4762+G5352+G5608+G5621+G5950+G6014+G6134+G6321+G6757+G7070"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{gene.lm.fit }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(}\FunctionTok{paste}\NormalTok{(}\StringTok{"Time\textasciitilde{} "}\NormalTok{,b,}\AttributeTok{sep =} \StringTok{""}\NormalTok{)    , }\AttributeTok{data =} \FunctionTok{as.data.frame}\NormalTok{(X))}
+\FunctionTok{summary}\NormalTok{(gene.lm.fit)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## lm(formula = paste("Time~ ", b, sep = ""), data = as.data.frame(X))
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -7.6746 -2.0535 -0.4498  1.8032  8.6811 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)   4.9480     0.2437  20.304  < 2e-16 ***
+## G1020        -0.3346     0.4058  -0.825 0.410439    
+## G1021        -0.7185     0.4475  -1.606 0.109801    
+## G1456        -0.6735     0.6259  -1.076 0.283069    
+## G1825        -1.9139     0.7080  -2.703 0.007399 ** 
+## G3395         0.2724     0.1656   1.645 0.101360    
+## G3807         0.3453     0.3023   1.142 0.254619    
+## G4131         0.2611     0.1193   2.189 0.029608 *  
+## G4248         0.7377     0.2158   3.419 0.000748 ***
+## G4762         1.1803     0.4735   2.493 0.013408 *  
+## G5352         0.5573     0.4007   1.391 0.165621    
+## G5608        -0.9164     0.5268  -1.740 0.083304 .  
+## G5621        -0.5048     0.2285  -2.209 0.028219 *  
+## G5950        -0.3245     0.5411  -0.600 0.549306    
+## G6014         1.4363     0.5992   2.397 0.017364 *  
+## G6134         0.6487     0.2858   2.270 0.024171 *  
+## G6321        -0.3548     0.1799  -1.973 0.049778 *  
+## G6757         1.2179     0.4241   2.872 0.004478 ** 
+## G7070        -1.5462     0.4558  -3.392 0.000821 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 3.353 on 221 degrees of freedom
+## Multiple R-squared:  0.4612, Adjusted R-squared:  0.4173 
+## F-statistic: 10.51 on 18 and 221 DF,  p-value: < 2.2e-16
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\StringTok{"Selected genes:"}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "Selected genes:"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Selected\_var[}\SpecialCharTok{{-}}\DecValTok{1}\NormalTok{]}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##  [1] "G1020" "G1021" "G1456" "G1825" "G3395" "G3807" "G4131" "G4248" "G4762"
+## [10] "G5352" "G5608" "G5621" "G5950" "G6014" "G6134" "G6321" "G6757" "G7070"
+\end{verbatim}
+
+\hypertarget{task-4-diagnostics-15-marks}{%
+\section{Task 4: Diagnostics (15
+marks)}\label{task-4-diagnostics-15-marks}}
+
+Carry out some residual diagnostics for the model fitted at the end of
+Task 3, and display the results graphically.
+
+Attempt a Box-Cox transformation, and refit the model using the
+suggested transformation. Repeat the residual diagnostics, and also
+consider the value of \(R^2\) of the transformed model. Give your
+judgement on whether you would prefer the original or the transformed
+model.
+
+\textbf{Answer:}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# ...}
+\FunctionTok{par}\NormalTok{(}\AttributeTok{mfrow=}\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{2}\NormalTok{), }\AttributeTok{cex=}\FloatTok{0.6}\NormalTok{)}
+\FunctionTok{plot}\NormalTok{(gene.lm.fit}\SpecialCharTok{$}\NormalTok{residuals, }\AttributeTok{main =} \StringTok{"Residuals before transform"}\NormalTok{)}
+\FunctionTok{plot}\NormalTok{(gene.lm.fit}\SpecialCharTok{$}\NormalTok{fitted, gene.lm.fit}\SpecialCharTok{$}\NormalTok{residuals, }\AttributeTok{main =} \StringTok{"Residuals vs fitted before transform"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Summative--Unscaled-_files/figure-latex/unnamed-chunk-16-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{require}\NormalTok{(MASS)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Loading required package: MASS
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{boxcox}\NormalTok{(gene.lm.fit, }\AttributeTok{main =} \StringTok{"BoxCox Plot"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: In lm.fit(x, y, offset = offset, singular.ok = singular.ok, ...) :
+##  extra argument 'main' will be disregarded
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\StringTok{"Since lambda = 0 we say y\^{}(lambda) = log(y)"}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "Since lambda = 0 we say y^(lambda) = log(y)"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Trans\_fit }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(}\FunctionTok{paste}\NormalTok{(}\StringTok{"log(Time) \textasciitilde{} "}\NormalTok{,b,}\AttributeTok{sep =} \StringTok{""}\NormalTok{)    , }\AttributeTok{data =} \FunctionTok{as.data.frame}\NormalTok{(X))}
+\FunctionTok{summary}\NormalTok{(Trans\_fit)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## lm(formula = paste("log(Time) ~ ", b, sep = ""), data = as.data.frame(X))
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -1.69822 -0.49539  0.02708  0.47648  1.39657 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)  1.29639    0.04670  27.762  < 2e-16 ***
+## G1020        0.01632    0.07775   0.210 0.833936    
+## G1021       -0.18321    0.08575  -2.137 0.033723 *  
+## G1456       -0.16057    0.11993  -1.339 0.181989    
+## G1825       -0.44511    0.13566  -3.281 0.001202 ** 
+## G3395        0.04822    0.03173   1.520 0.129922    
+## G3807        0.13111    0.05793   2.263 0.024587 *  
+## G4131        0.04418    0.02285   1.933 0.054459 .  
+## G4248        0.10502    0.04134   2.540 0.011762 *  
+## G4762        0.22336    0.09073   2.462 0.014589 *  
+## G5352        0.12637    0.07677   1.646 0.101184    
+## G5608       -0.13861    0.10094  -1.373 0.171057    
+## G5621       -0.11378    0.04379  -2.598 0.010003 *  
+## G5950       -0.01228    0.10368  -0.118 0.905849    
+## G6014        0.17367    0.11483   1.512 0.131849    
+## G6134        0.10025    0.05476   1.831 0.068481 .  
+## G6321       -0.07796    0.03447  -2.262 0.024674 *  
+## G6757        0.14512    0.08126   1.786 0.075506 .  
+## G7070       -0.29485    0.08734  -3.376 0.000869 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 0.6425 on 221 degrees of freedom
+## Multiple R-squared:  0.4447, Adjusted R-squared:  0.3995 
+## F-statistic: 9.833 on 18 and 221 DF,  p-value: < 2.2e-16
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{par}\NormalTok{(}\AttributeTok{mfrow=}\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{2}\NormalTok{), }\AttributeTok{cex=}\FloatTok{0.6}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Summative--Unscaled-_files/figure-latex/unnamed-chunk-16-2.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{plot}\NormalTok{(Trans\_fit}\SpecialCharTok{$}\NormalTok{residuals, }\AttributeTok{main =} \StringTok{"Residuals after transform"}\NormalTok{)}
+\FunctionTok{plot}\NormalTok{(Trans\_fit}\SpecialCharTok{$}\NormalTok{fitted, Trans\_fit}\SpecialCharTok{$}\NormalTok{residuals, }\AttributeTok{main =} \StringTok{"Residuals vs fitted after transform"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Summative--Unscaled-_files/figure-latex/unnamed-chunk-16-3.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\StringTok{"Original r squared before transform:"}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "Original r squared before transform:"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(gene.lm.fit)}\SpecialCharTok{$}\NormalTok{r.squared}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0.4611514
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\StringTok{""}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] ""
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\StringTok{"New r squared after transform:"}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "New r squared after transform:"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(Trans\_fit)}\SpecialCharTok{$}\NormalTok{r.squared}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0.4447176
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\StringTok{"Lets start by looking at the resiual analysis:}
+\StringTok{Residuals plot: before and after the transform the residuals look independent due to no pattern.}
+\StringTok{Fitted residuals plot: Before the transform clear pattern (trumpet like) which suggests we have violated homoscedasticity}
+\StringTok{After the transform we see no such shapes. suggesting the boxcox transform has not violated this. From this I am siding with the teansform, but lets compare r squared values.}
+
+\StringTok{From the r squared values we can clearly see the non{-}transformed model has the best statistic}
+
+\StringTok{So from this I have had to look else where for a better answer, the model:}
+\StringTok{As we are using ordinary least squares which assumes normality I will have to say I would prefer to use the transform model as it \textquotesingle{}garantees\textquotesingle{} this wont be violated and we can see it fixes the problem of the data violating homoscedasticity, the only caveat is the transform model has a slighly worse r squared stat."}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "Lets start by looking at the resiual analysis:\nResiduals plot: before and after the transform the residuals look independent due to no pattern.\nFitted residuals plot: Before the transform clear pattern (trumpet like) which suggests we have violated homoscedasticity\nAfter the transform we see no such shapes. suggesting the boxcox transform has not violated this. From this I am siding with the teansform, but lets compare r squared values.\n\nFrom the r squared values we can clearly see the non-transformed model has the best statistic\n\nSo from this I have had to look else where for a better answer, the model:\nAs we are using ordinary least squares which assumes normality I will have to say I would prefer to use the transform model as it 'garantees' this wont be violated and we can see it fixes the problem of the data violating homoscedasticity, the only caveat is the transform model has a slighly worse r squared stat."
+\end{verbatim}
+
+\hypertarget{task-5-nonparametric-smoothing-15-marks}{%
+\section{Task 5: Nonparametric smoothing (15
+marks)}\label{task-5-nonparametric-smoothing-15-marks}}
+
+In this task we are interested in modelling \texttt{Time} through a
+\textbf{single} gene, through a nonparametric, univariate, regression
+model.
+
+Firstly, based on previous analysis, choose a gene which you deem
+suitable for this task. Provide a scatterplot of the \texttt{Time}
+(vertical) versus the expression values of that gene (horizontal).
+
+Identify a nonparametric smoother of your choice to carry out this task.
+Based on visual inspection, or trial and error, determine a smoothing
+parameter which appears suitable, and add the resulting fitted curve to
+the scatterplot.
+
+\textbf{Answer:}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# ...}
+\FunctionTok{require}\NormalTok{(KernSmooth)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Loading required package: KernSmooth
+\end{verbatim}
+
+\begin{verbatim}
+## KernSmooth 2.23 loaded
+## Copyright M. P. Wand 1997-2009
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\StringTok{"I will pick one of the genes that has the lowest p value as it is likey a significant gene/feature for predicing the Response."}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "I will pick one of the genes that has the lowest p value as it is likey a significant gene/feature for predicing the Response."
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{pvals}\OtherTok{\textless{}{-}}\FunctionTok{summary}\NormalTok{(gene.lm.fit)}\SpecialCharTok{$}\NormalTok{coef[}\SpecialCharTok{{-}}\DecValTok{1}\NormalTok{,}\DecValTok{4}\NormalTok{]}
+\NormalTok{geness}\OtherTok{\textless{}{-}} \FunctionTok{which.min}\NormalTok{(pvals)}
+
+\NormalTok{best.gene}\OtherTok{\textless{}{-}}\FunctionTok{names}\NormalTok{(geness)}
+
+\FunctionTok{sprintf}\NormalTok{(}\StringTok{"The gene I chose is: \%s"}\NormalTok{, best.gene)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "The gene I chose is: G4248"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{plot}\NormalTok{(X[,best.gene], Time, }\AttributeTok{main =} \StringTok{"Time vs best gene (G4248) fitted with locpoly"}\NormalTok{)}
+
+
+
+\NormalTok{h }\OtherTok{\textless{}{-}} \FloatTok{0.5}
+\StringTok{"Through trial and error I found h is roughly:"}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "Through trial and error I found h is roughly:"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{h}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0.5
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{fossil.loc }\OtherTok{\textless{}{-}} \FunctionTok{locpoly}\NormalTok{(X[,best.gene], Time, }\AttributeTok{bandwidth=}\NormalTok{h)}
+\FunctionTok{lines}\NormalTok{(fossil.loc, }\AttributeTok{col=}\DecValTok{2}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Summative--Unscaled-_files/figure-latex/unnamed-chunk-17-1.pdf}
+
+\hypertarget{task-6-bootstrap-confidence-intervals-22-marks}{%
+\section{Task 6: Bootstrap confidence intervals (22
+marks)}\label{task-6-bootstrap-confidence-intervals-22-marks}}
+
+Continuing from Task 5 (with the same, single, predictor variable, and
+the same response \texttt{Time}), proceed with a more systematic
+analysis. Specifically, produce a nonparametric smoother featuring
+
+\begin{itemize}
+\tightlist
+\item
+  a principled way to select the smoothing parameter;
+\item
+  bootstrapped confidence bands.
+\end{itemize}
+
+The smoothing method that you use in this Task may be the same or a
+different one as used in Task 5, but you are \emph{not} allowed to make
+use of R function \texttt{gam}. If you use any built-in R functions to
+select the smoothing parameter or carry out the bootstrap, explain
+briefly what they do.
+
+Produce a plot which displays the fitted smoother with the bootstrapped
+confidence bands. Add to this plot the regression line of a simple
+linear model with the only predictor variable being the chosen gene
+(beside the intercept).
+
+Finally, report the values of \(R^2\) of both the nonparametric and the
+parametric model. Conclude with a statement on the usefulness of the
+nonparametric model.
+
+\textbf{Answer:}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# ...}
+
+\NormalTok{smooth.loc}\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(x,y,}\AttributeTok{xgrid=}\NormalTok{x, h)\{}
+\NormalTok{  N}\OtherTok{\textless{}{-}}\FunctionTok{length}\NormalTok{(xgrid)}
+\NormalTok{  smooth.est}\OtherTok{\textless{}{-}}\FunctionTok{rep}\NormalTok{(}\DecValTok{0}\NormalTok{,N)}
+  
+  \ControlFlowTok{for}\NormalTok{ (j }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\NormalTok{N)\{}
+    
+\NormalTok{    smooth.est[j]}\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(y}\SpecialCharTok{\textasciitilde{}}\FunctionTok{I}\NormalTok{(x}\SpecialCharTok{{-}}\NormalTok{xgrid[j]),}
+    \AttributeTok{weights=}\FunctionTok{dnorm}\NormalTok{(x,xgrid[j],h) )}\SpecialCharTok{$}\NormalTok{coef[}\DecValTok{1}\NormalTok{]}
+\NormalTok{  \}}
+  
+  \FunctionTok{list}\NormalTok{(}\AttributeTok{x=}\NormalTok{ xgrid, }\AttributeTok{fit=}\NormalTok{smooth.est)}
+\NormalTok{\}}
+
+\NormalTok{h }\OtherTok{\textless{}{-}} \FunctionTok{dpill}\NormalTok{(X[,best.gene], Time, }\AttributeTok{truncate=}\ConstantTok{FALSE}\NormalTok{)}
+\NormalTok{Gene.loc }\OtherTok{\textless{}{-}} \FunctionTok{smooth.loc}\NormalTok{(X[,best.gene], Time, }\AttributeTok{h=}\NormalTok{h)}
+
+
+\NormalTok{Gene.res }\OtherTok{\textless{}{-}}\NormalTok{ Time }\SpecialCharTok{{-}}\NormalTok{ Gene.loc}\SpecialCharTok{$}\NormalTok{fit}
+\NormalTok{boot.fit }\OtherTok{\textless{}{-}} \FunctionTok{matrix}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{200}\NormalTok{,}\FunctionTok{dim}\NormalTok{(patient.data}\SpecialCharTok{$}\NormalTok{x)[}\DecValTok{2}\NormalTok{])}
+
+\ControlFlowTok{for}\NormalTok{ (j }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\DecValTok{200}\NormalTok{)\{}
+\NormalTok{  boot.res }\OtherTok{\textless{}{-}} \FunctionTok{sample}\NormalTok{(Gene.res, }\AttributeTok{size=}\FunctionTok{dim}\NormalTok{(patient.data}\SpecialCharTok{$}\NormalTok{x)[}\DecValTok{2}\NormalTok{])}
+\NormalTok{  new.y }\OtherTok{\textless{}{-}}\NormalTok{ Gene.loc}\SpecialCharTok{$}\NormalTok{fit }\SpecialCharTok{+}\NormalTok{boot.res}
+  
+  \DocumentationTok{\#\#\#\#\# h selection}
+\NormalTok{  h }\OtherTok{\textless{}{-}} \FunctionTok{dpill}\NormalTok{(X[,best.gene], new.y, }\AttributeTok{truncate=}\ConstantTok{FALSE}\NormalTok{)}
+  
+\NormalTok{  boot.fit[j,] }\OtherTok{\textless{}{-}} \FunctionTok{smooth.loc}\NormalTok{(X[,best.gene], new.y, }\AttributeTok{h=}\NormalTok{h)}\SpecialCharTok{$}\NormalTok{fit}
+\NormalTok{\}}
+
+\NormalTok{lower}\OtherTok{\textless{}{-}}\NormalTok{upper}\OtherTok{\textless{}{-}} \FunctionTok{rep}\NormalTok{(}\DecValTok{0}\NormalTok{,}\FunctionTok{dim}\NormalTok{(patient.data}\SpecialCharTok{$}\NormalTok{x)[}\DecValTok{2}\NormalTok{])}
+\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\FunctionTok{dim}\NormalTok{(patient.data}\SpecialCharTok{$}\NormalTok{x)[}\DecValTok{2}\NormalTok{])\{}
+\NormalTok{  lower[i]}\OtherTok{\textless{}{-}}\FunctionTok{quantile}\NormalTok{(boot.fit[,i],}\FloatTok{0.025}\NormalTok{)}
+\NormalTok{  upper[i]}\OtherTok{\textless{}{-}}\FunctionTok{quantile}\NormalTok{(boot.fit[,i],}\FloatTok{0.975}\NormalTok{)}
+\NormalTok{\}}
+
+\FunctionTok{plot}\NormalTok{(X[,best.gene], Time, }\AttributeTok{main =} \StringTok{"Time vs best gene (G4248) using nonparametric smoother and confidence bands"}\NormalTok{)}
+\ControlFlowTok{for}\NormalTok{ (j }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\DecValTok{200}\NormalTok{)\{ }\FunctionTok{lines}\NormalTok{(X[,best.gene][}\FunctionTok{order}\NormalTok{(X[,best.gene])], boot.fit[j,][}\FunctionTok{order}\NormalTok{(X[,best.gene])], }\AttributeTok{col=}\StringTok{"grey"}\NormalTok{)\}}
+\FunctionTok{lines}\NormalTok{(X[,best.gene][}\FunctionTok{order}\NormalTok{(X[,best.gene])], Gene.loc}\SpecialCharTok{$}\NormalTok{fit[}\FunctionTok{order}\NormalTok{(X[,best.gene])])}
+\FunctionTok{lines}\NormalTok{(X[,best.gene][}\FunctionTok{order}\NormalTok{(X[,best.gene])], upper[}\FunctionTok{order}\NormalTok{(X[,best.gene])], }\AttributeTok{col=}\DecValTok{2}\NormalTok{, }\AttributeTok{lwd=}\DecValTok{3}\NormalTok{)}
+\FunctionTok{lines}\NormalTok{(X[,best.gene][}\FunctionTok{order}\NormalTok{(X[,best.gene])], lower[}\FunctionTok{order}\NormalTok{(X[,best.gene])], }\AttributeTok{col=}\DecValTok{2}\NormalTok{, }\AttributeTok{lwd=}\DecValTok{3}\NormalTok{)}
+
+\NormalTok{tt}\OtherTok{\textless{}{-}}\FunctionTok{lm}\NormalTok{(Time }\SpecialCharTok{\textasciitilde{}}\NormalTok{ X[,best.gene], }\AttributeTok{data =} \FunctionTok{as.data.frame}\NormalTok{(X))}
+
+
+\FunctionTok{abline}\NormalTok{(tt, }\AttributeTok{col=}\DecValTok{5}\NormalTok{, }\AttributeTok{lwd=}\DecValTok{2}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Summative--Unscaled-_files/figure-latex/unnamed-chunk-18-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\StringTok{"R squared of parametric model"}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "R squared of parametric model"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(tt)}\SpecialCharTok{$}\NormalTok{r.squared}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0.04814878
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\StringTok{""}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] ""
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\StringTok{"R squared of non{-}parametric model"}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "R squared of non-parametric model"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{rr}\OtherTok{\textless{}{-}} \DecValTok{1}\SpecialCharTok{{-}}\NormalTok{(}\FunctionTok{sum}\NormalTok{((Time}\SpecialCharTok{{-}}\NormalTok{Gene.loc}\SpecialCharTok{$}\NormalTok{fit)}\SpecialCharTok{\^{}}\DecValTok{2}\NormalTok{))}\SpecialCharTok{/}\NormalTok{(}\FunctionTok{sum}\NormalTok{((Time}\SpecialCharTok{{-}}\FunctionTok{mean}\NormalTok{(Time))}\SpecialCharTok{\^{}}\DecValTok{2}\NormalTok{))}
+\NormalTok{rr}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0.07944572
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\StringTok{"statement on the usefulness of the nonparametric model:}
+\StringTok{As you can see the non parametric model had a better r squared and therfore fitted the data better, non parametric models are also very useful as they usaully rquire less tuning in terms of hyperparamters. They are also a very general model which can be used in manyu applications.In this case they out performed the paramteric models making them very useful and easy to use! However only uing one of the genes to predict our response is not useful in either case and we get very poor r squared values."}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "statement on the usefulness of the nonparametric model:\nAs you can see the non parametric model had a better r squared and therfore fitted the data better, non parametric models are also very useful as they usaully rquire less tuning in terms of hyperparamters. They are also a very general model which can be used in manyu applications.In this case they out performed the paramteric models making them very useful and easy to use! However only uing one of the genes to predict our response is not useful in either case and we get very poor r squared values."
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\StringTok{"I used the dpill to select my smoothing paramter, This simply finds the bandwidth h which minimises the integrated asymptotic mean squared error where h \textasciitilde{} n\^{}{-}1/5"}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "I used the dpill to select my smoothing paramter, This simply finds the bandwidth h which minimises the integrated asymptotic mean squared error where h ~ n^-1/5"
+\end{verbatim}
+
+\end{document}

@@ -1,0 +1,294 @@
+---
+title: "ASML Regression, Computer Lab 2"
+author: "Jochen Einbeck"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+
+## Real estate prize data: Preliminaries
+
+We consider again the data set on real estate prizes extracted from  [kaggle](https://www.kaggle.com/quantbruce/real-estate-price-prediction/).
+
+You can read in the data via
+
+```{r}
+realestate<- read.csv("http://www.maths.dur.ac.uk/~dma0je/Data/Realestate.csv", header=TRUE)
+```
+
+We do the same simplifications of long variable names as in the last practical:
+
+```{r}
+colnames(realestate)[8]<- "Y"
+colnames(realestate)[5]<- "X4.stores"
+colnames(realestate)[4] <- "X3.MRT"
+```
+
+## Multiple linear regression
+
+Clearly, the simple linear regression model considered in the previous lab is not yet a very good model, so let us include more variables.  Therefore, fit a multiple linear regression model, with all variables $x_1, \ldots, x_6$ as predictors, and store it into an object `real.fit2`. 
+
+*Note*: You can add multiple predictors to `lm` by seperating them through  `+` symbols after the `~`.
+
+```{r}
+real.fit2<- lm(Y~ X1.transaction.date + X2.house.age + X3.MRT + X4.stores 
+               + X5.latitude + X6.longitude, data=realestate)
+
+```
+
+Display the `summary` of the fitted object. Note that the displayed table may be hard to read; something like `round(summary(real.fit2)$coef, digits=4)` will look better. 
+
+```{r}
+summary(real.fit2)
+round(summary(real.fit2)$coef, digits=4)
+```
+
+Adapt the previously introduced bootstrap methodology to this scenario.
+
+```{r}
+B <- 199
+n <- dim(realestate)[1]
+Ynew <- matrix(0, n, B)
+X <- model.matrix(real.fit2)
+Y<- realestate$Y
+Xnew<-list()
+p<- dim(X)[2]
+for (b in 1:B){
+  Xnew[[b]]<- X
+  for (i in 1:n){
+    j<-sample(n,1)
+    Xnew[[b]][i,]<- X[j,]
+    Ynew[i,b] <-Y[j]
+  }
+}
+
+all.real.boot <-matrix(0, B, p)
+
+for (b in 1:B){
+  real.fitb<- lm(Ynew[,b]~Xnew[[b]])
+  all.real.boot[b,]<- summary(real.fitb)$coef[,1]
+}
+
+all.boot2.sd<- apply(all.real.boot, 2, sd)
+```
+
+
+Produce a matrix which in the first row contains the standard errors of the linear model fitted through the `lm` function, and in the second row the standard errors obtained through the Bootstrap procedure. 
+
+```{r}
+both.real.sd <- rbind( summary(real.fit2)$coef[,2], all.boot2.sd)
+both.real.sd
+```
+
+Let's now apply again Jags. One thing that you need to know here is that, for multiple linear regression, the MCMC routine will be very inefficient (small acceptance rates) if the predictors are not scaled (to zero mean and unit variance).  Therefore, we need to scale them. This could be done for instance as follows:
+
+
+```{r}
+# The design matrix without the intercept
+realX <- as.matrix(realestate[,2:7])
+
+# We need to keep the means and sd.'s for later `unscaling':
+m <- apply(realX, 2,mean)
+S <- apply(realX, 2, sd)
+
+# This is the actual scaling step:
+SrealX<-scale(realX)
+
+# Check:
+apply(SrealX, 2, mean)
+apply(SrealX,2,sd)
+
+```
+
+Implement from here on the machinery as usual, but with the obvious adjustments as we have now multiple predictors.
+
+```{r}
+model2_string <- "model{
+  for(i in 1:N){ 
+    y[i] ~ dnorm(mu[i], tau)   # tau = precision=inverse variance
+    mu[i] <- beta0+beta%*%X[i,]
+  } 
+  # Prior distribution on mean
+    beta0 ~ dnorm(0, 0.0001);    
+    for (j in 1:6){
+      beta[j]~  dnorm(0, 0.0001)
+    }
+    tau  ~ dgamma(0.01, 0.01)
+    sigma<- 1/sqrt(tau)
+   
+}"
+
+```
+
+Finally, execute the actual MCMC sampling and the collection of posterior samples:
+
+```{r}
+require(rjags)
+model2 <- jags.model(textConnection(model2_string), 
+            data = list(X=SrealX, y=Y,N=dim(realX)[1])
+          )
+
+update(model2, 10000)
+
+postmod2.samples = coda.samples(model2, c("beta0", "beta", "sigma"), 10000)[[1]]
+
+summary(postmod2.samples)
+
+```
+
+If you look at the `summary` output of the posterior samples you see that the estimates do not quite seem to make sense, except for `sigma`. This is due to the scaling step executed previously. To obtain sensible results, we need to un-scale them. To see how to do this, denote the model of interest (non-scaled) by
+
+$y=\alpha+ \sum_{j=1}^p \beta_j x_j$
+
+where the intercept, $\alpha$, has been separated from the other model parameters, and 
+the error term has been omitted for ease of presentation. Let $m_j$ denote the mean of all observations from the $j$th predictor variable. Then the scaled predictor variables can be written as (this is exactly what function  `scale` does)
+ 
+$x_j^*= (x_j-m_j)/s_j$
+
+Let us write the model for the scaled predictors as
+
+$y= \alpha^*+ \sum_{j=1}^p \beta_j^* x_j^*$
+
+The question is: How to write $\alpha$, $\beta_j$ in terms of $\alpha^*$, $\beta_j^*$?
+
+Answer: We see that
+
+$y= \alpha^*+ \sum_j \frac{x_j-m_j}{s_j}\beta_j^* = \sum_j \frac{\beta_j^*}{s_j} x_j - \sum_j \frac{m_j}{s_j}\beta_j^*+\alpha^*$
+
+so that clearly
+
+$\beta_j= \beta_j^*/s_j$
+and
+
+$\alpha= \alpha^*- \sum_j \frac{m_j}{s_j}\beta_j^*= \alpha^*- \sum m_j \beta_j$
+
+This gives rise to the following code (incl. comparison with frequentist linear model fit):
+
+```{r}
+# beta_j
+beta.jags<- rowMeans(t(postmod2.samples[,1:6])/S)
+rbind(beta.jags,
+      real.fit2$coef[2:7])
+
+# alpha
+real.fit2$coef[1]
+mean(postmod2.samples[,7])-m%*%beta.jags
+
+```
+
+We see good agreement with the frequentist linear model.
+
+Similar, one can recover the standard errors for the beta parameters as follows:
+
+```{r}
+sebeta.jags <- round(apply(t(postmod2.samples[,1:6])/S, 1,sd), digits=4)
+rbind(
+ sebeta.jags,
+ summary(real.fit2)$coef[2:7,2]
+)
+```
+
+##  Multiple regression using ridge and lasso penalties
+
+Use the following code to load R package `glmnet` and to produce a $414 \times 6$ data matrix which only contains the predictor variables:
+
+```{r}
+require(glmnet)
+realX<-  as.matrix(realestate[,2:7])
+dim(realX)
+```
+
+Carry out ridge regression using `glmnet` as in the lecture, and apply `plot` on the fitted object with option `xvar="lambda"` to see the trajectories of estimated parameters.
+
+```{r}
+real.ridge<- glmnet(realX, realestate$Y, family="gaussian", alpha=0)
+real.ridge
+plot(real.ridge, xvar="lambda")
+
+```
+
+
+We next carry out cross-validation in order to select the penalty parameter $\lambda$.  You can  use the following code sequence in order to do this. Make it clear to yourself what this code actually does.
+
+```{r}
+real.ridge.cv=  cv.glmnet(realX, realestate$Y, alpha=0 )
+par(mfrow=c(1,1), mai=c(0.8,0.8,0.8,0.8), cex.axis=2)
+plot(real.ridge.cv)
+real.ridge.cv$lambda.min
+real.ridge.coef<- coef(real.ridge.cv, s="lambda.min")[,1]
+```
+
+Now reproduce all steps carried out for ridge regression, this time using the lasso (that is, `alpha=1`).
+
+```{r}
+real.lasso<- glmnet(realX, realestate$Y, family="gaussian", alpha=1)
+real.lasso
+plot(real.lasso, xvar="lambda")
+real.lasso.cv=  cv.glmnet(realX, realestate$Y, alpha=1 )
+par(mfrow=c(1,1), mai=c(0.8,0.8,0.8,0.8), cex.axis=2)
+plot(real.lasso.cv)
+real.lasso.cv$lambda.min
+real.lasso.coef<- coef(real.lasso.cv, s="lambda.min")[,1]
+
+```
+
+Create a $3 \times 6$ matrix which in the first row has the parameter estimates from ordinary least squares regression, in the second row those from ridge regression, and in the third row those from the lasso. Give each row appropriate names.
+
+
+
+```{r}
+all.estimates<- rbind(real.fit2$coef,
+        real.ridge.coef,
+       real.lasso.coef
+      )
+rownames(all.estimates)<-c("LS", "Ridge", "Lasso")
+all.estimates
+```
+
+
+Adapt the previously introduced bootstrap methodology to the ridge regression scenario, and save the standard errors of the model parameters into an object `real.ridge.boot.sd`
+
+
+```{r}
+B <- 199 # ideally 999 or so, but used 199 here for quick compilation
+n <- dim(realX)[1]
+Ynew <- matrix(0, n, B)
+X <- model.matrix(real.fit2)
+Y<- realestate$Y
+Xnew<-list()
+p<- dim(X)[2]
+for (b in 1:B){
+  j<-sample(n, replace=TRUE)
+  Xnew[[b]]<- X[j,2:7]
+  Ynew[,b]<-Y[j]
+}
+
+real.ridge.boot<-matrix(0, B, p)
+
+for (b in 1:B){
+  real.cv<- cv.glmnet(Xnew[[b]], Ynew[,b], alpha=0 )
+  real.bridge<-  coef(real.cv , s="lambda.min" )
+  real.ridge.boot[b,]<- as.vector(real.bridge)
+  if (b%%10==0){print(b)}
+}
+
+boxplot(real.ridge.boot[,2:7])
+
+real.ridge.boot.sd<- apply(real.ridge.boot, 2, sd)
+real.ridge.boot.sd
+
+#abline(0,0,col=3)
+
+```
+
+Create a new $7 \times 2$ matrix `real.ridge.fit` which in the first row contains the ridge estimates and in the second row their bootstrap standard errors. Then devide the first row by the second, yielding "bootstrapped ridge regression t values". Visualize these through a `barplot' and draw horizontal lines at $\pm 2$. Interpret.
+
+```{r}
+real.ridge.fit<- rbind(real.ridge.coef, real.ridge.boot.sd)
+real.ridge.t<- real.ridge.fit[1,]/real.ridge.fit[2,]
+barplot(real.ridge.t)
+abline(2,0, col=2)
+abline(-1,0, col=2)
+```        
+

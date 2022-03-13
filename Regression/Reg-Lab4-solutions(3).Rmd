@@ -1,0 +1,241 @@
+---
+title: "ASML Regression, Computer Lab 4"
+author: "Jochen Einbeck"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+
+
+# Preliminaries
+
+Finally, consider again the data set on real estate prizes extracted from  [kaggle](https://www.kaggle.com/quantbruce/real-estate-price-prediction/).
+
+You can read in the data via
+
+```{r}
+realestate<- read.csv("http://www.maths.dur.ac.uk/~dma0je/Data/Realestate.csv", header=TRUE)
+head(realestate)
+```
+
+We do the same simplifications of long variable names as in the last practicals:
+
+```{r}
+colnames(realestate)[8] <- "Y"
+colnames(realestate)[5] <- "X4.stores"
+colnames(realestate)[4] <- "X3.MRT"
+```
+
+## Real estate prize data: Additive models
+
+We consider now nonparametric additive models instead of the linear regression model. Let's begin with kernels, so please load R package `gam`, then use R function `gam` with an `lo()` wrapped around each predictor. Plot the result, and also apply the `summary` function on it.
+
+```{r}
+require(gam)
+real.gam1<- gam(Y~ lo(X1.transaction.date) + lo(X2.house.age) +
+    lo(X3.MRT) + lo(X4.stores) + lo(X5.latitude)+lo(X6.longitude), 
+    data=realestate)
+plot(real.gam1)
+summary(real.gam1)
+```
+
+There are two ANOVA tables in this output. The first one, "Anova for parametric effects", tests whether the relevant term is needed at all (here: small p-values for all of them, so, yes). The second one, "Anova for nonparametric effects",  tests $H_0$: "a linear term for this coefficient is sufficient" versus $H_1$: "a nonparametric term is required". Following this concept, replace terms which are non-significant at the 10% level (that is, terms with $p^*>0.1$) by linear ones (that is, remove the `lo()` but keep the corresponding predictors):
+
+```{r}
+real.gam2 <- gam(Y~ X1.transaction.date + lo(X2.house.age) 
+    + lo(X3.MRT) + X4.stores + lo(X5.latitude) + lo(X6.longitude), 
+    data=realestate)
+plot(real.gam2)
+summary(real.gam2)
+```
+
+Repeat the analysis using splines instead of kernels, now with R function `gam` in R package `mgcv`, and using `s()` instead of `lo()`. Before doing this the other package needs to be 'detached', as the two packages otherwise interfere with each other. 
+
+
+```{r}
+real.gam3<- gam(Y~ s(X1.transaction.date) + s(X2.house.age) + s(X3.MRT) + 
+            s(X4.stores) + s(X5.latitude) + s(X6.longitude), 
+            data=realestate)
+plot(real.gam3)
+summary(real.gam3)
+```
+
+```{r}
+real.gam4<- gam(Y~ s(X1.transaction.date) + s(X2.house.age) 
+                + s(X3.MRT) + X4.stores + s(X5.latitude) + X6.longitude,
+                data=realestate)
+plot(real.gam4)
+summary(real.gam4)
+```
+
+We see that the two additive models behave slightly differently. The local model suggests that all terms carry some significance, but that linear terms should be used for `X1` and `X4`. The spline model suggests that `X6` is not significant at all [agreeing with our previous results using ridge regression and the Lasso], and suggests a linear term for `X4'.
+
+
+##  LIDAR data: Gaussian Process Regression
+
+Consider again the data set from the LIDAR experiment.
+
+```{r}
+library(SemiPar)
+data(lidar)
+plot(lidar)
+attach(lidar)
+```
+
+Fit a Gaussian Process model to these data using function `km`, with `range` as predictor variable, and `logratio` as response. Save the fitted model into an object `lidar.model`. 
+
+*Note*: You may need to install R package `DiceKriging` first. 
+
+```{r}
+require(DiceKriging)
+lidar.model <- km(formula<- ~1, design=data.frame(x=range),
+                  response=data.frame(y=logratio),
+                  covtype="gauss", nugget.estim=TRUE)
+```
+
+Apply `print` and `plot` on `lidar.model`:
+
+```{r}
+print(lidar.model)
+plot(lidar.model)
+```
+
+Now, set up the vector $x^*=$`r.star` on which to evaluate the fitted Gaussian process model. Define for this a grid of type
+
+```{r}
+r.star <- seq(400,750, length=72)
+```
+
+[*Note*: It is useful to produce a grid which does not coincide with the available `range` values, as otherwise the GP will try to interpolate those values, even with a large length-scale. ]
+
+
+Use function `predict` (which, when applied on `lidar.model`, will automatically invoke `predict.km`) to extract the posterior mean for `r.star`. Use option `type="SK".
+
+```{r}
+lidar.p <- predict(lidar.model, data.frame(x=r.star), type="SK")
+```
+
+Produce a scatterplot of the original data, and overlay the posterior mean function as well as $95\%$ upper and lower confidence bands.  
+
+```{r}
+plot(range, logratio, col="red", pch=19)
+lines(r.star,lidar.p$mean,lwd=2)
+lines(r.star,lidar.p$upper95, col=2)
+lines(r.star,lidar.p$lower95, col=2)
+```
+
+Redo this analysis, but this time setting all parameters manually. Do this firstly by extracting the estimated parameters from the model above, and supplying these to `coef.cov`, `coef.var`, and `nugget`. 
+
+```{r}
+lidar.model2 <- km(formula<- ~1, design=data.frame(x=lidar$range),
+                  response=data.frame(y=lidar$logratio), 
+                  covtype="gauss", 
+                  coef.cov=55, coef.var=0.055, nugget=0.006)
+
+lidar.p2 <- predict(lidar.model2, data.frame(x=r.star), type="SK")
+plot(range, logratio, col="red", pch=19)
+lines(r.star, lidar.p2$mean,lwd=2)
+lines(r.star, lidar.p2$upper95, col=2)
+lines(r.star, lidar.p2$lower95, col=2)
+```
+
+Then set the length-scale parameter to half, and then double, of the orinal value, and observe the outcome.
+
+```{r}
+lidar.model3 <- km(formula<- ~1, design=data.frame(x=lidar$range),
+                  response=data.frame(y=lidar$logratio), 
+                  covtype="gauss", 
+                  coef.cov=25, coef.var=0.05, nugget=0.006)
+
+r.star<-seq(400,750, length=72)
+lidar.p3 <- predict(lidar.model3, data.frame(x=r.star), type="SK")
+plot(lidar$range, lidar$logratio, col="red", pch=19)
+lines(r.star, lidar.p3$mean,lwd=2)
+lines(r.star, lidar.p3$upper95, col=2)
+lines(r.star, lidar.p3$lower95, col=2)
+```
+
+
+```{r}
+lidar.model4 <- km(formula<- ~1, design=data.frame(x=lidar$range),
+                  response=data.frame(y=lidar$logratio), 
+                  covtype="gauss", 
+                  coef.cov=110, coef.var=0.05, nugget=0.006)
+
+r.star<-seq(400,750, length=72)
+lidar.p4<- predict(lidar.model4, data.frame(x=r.star), type="SK")
+plot(lidar$range, lidar$logratio, col="red", pch=19)
+lines(r.star, lidar.p4$mean,lwd=2)
+lines(r.star, lidar.p4$upper95, col=2)
+lines(r.star, lidar.p4$lower95, col=2)
+```
+
+Play around with the other two variance parameters and observe the outcome.
+
+```{r}
+# ...
+
+```
+
+If there is still time, produce a manual implementation of this Gaussian process model as in Slides 17 to 25 of the lecture slides. Use the same parameters as suggested by the `km` fit above.
+
+```{r}
+# Set up covariances and parameters
+
+expCov <- function(X1,X2,l=1, sigmaf=1) {
+  Sigma <- matrix(rep(0, length(X1)*length(X2)), nrow=length(X1))
+  for (i in 1:nrow(Sigma)) {
+    for (j in 1:ncol(Sigma)) {
+      Sigma[i,j] <- sigmaf^2*exp(-0.5*(abs(X1[i]-X2[j])/l)^2)
+    }
+  }
+  return(Sigma)
+}
+
+lidar.l <- 55
+lidar.sigmaf <- sqrt(0.055)
+lidar.sigmay <- sqrt(0.0063)
+
+lidar.K <- expCov(range,range, l=lidar.l, sigmaf=lidar.sigmaf)
+lidar.Ks <- expCov(range,r.star,l=lidar.l,  sigmaf=lidar.sigmaf)
+lidar.Kss <- expCov(r.star,r.star,l=lidar.l,  sigmaf=lidar.sigmaf)
+```
+
+```{r}
+# Calculate the posterior mean and covariance functions
+lidar.mu.tilde <- 
+  t(lidar.Ks)%*%solve(lidar.K + lidar.sigmay^2*diag(1, ncol(lidar.K)))%*%logratio
+lidar.sig.tilde <- lidar.Kss - 
+  t(lidar.Ks)%*%solve(lidar.K + lidar.sigmay^2*diag(1, ncol(lidar.K)))%*%lidar.Ks
+```
+
+```{r}
+# plot the posterior mean function
+plot(range,logratio, ylim=c(-1,0.2) )
+lines(r.star,lidar.mu.tilde, lwd=3)
+```
+
+
+```{r}
+require(MASS)
+# Draw and plot 100 sample functions
+plot(range,logratio, ylim=c(-1,0.2) )
+lines(r.star,lidar.mu.tilde, lwd=3)
+n.samples<-100
+lidar.values <- matrix(rep(0,length(r.star)*n.samples), ncol=n.samples)
+
+for (i in 1:n.samples) {
+  lidar.values[,i] <- mvrnorm(1, lidar.mu.tilde, lidar.sig.tilde)
+}
+
+for (j in 1:100){
+  lines(r.star, lidar.values[,j],col=j )
+}
+```
+
+We see these are residing in a smaller range than would be indicated by the solution of `km`. For this specific data set, a contributing factor could be the heteroscedasticity, which is technically a model violation and may cause `km` to produce larger variability bands than actually necessary. 
+
+
+
+

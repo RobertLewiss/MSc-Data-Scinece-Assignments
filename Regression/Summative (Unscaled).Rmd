@@ -1,0 +1,464 @@
+---
+title: "Assignment for ASML (Submodule Regression) Epiphany 2021"
+author: "Put your anonymous Z code here"
+output:
+  pdf_document: default
+  html_document: 
+    df_print: paged
+  html_notebook: 
+    df_print: paged
+  word_document: default
+---
+
+
+# General Instructions
+
+Please go through the R notebook below, and carry out the requested tasks. You will provide all your answers directly into this .Rmd file. Add code into the R chunks where requested. You can create new chunks where required. Where text answers are requested, please add them directly into this document, typically below the R chunks, using R Markdown syntax as appropriate. 
+
+At the end, you will submit only your `knitted' PDF version of the notebook, through Tunitin on DUO, but not the .Rmd file itself.
+
+**Important notes**: 
+
+* Please ensure carefully that all chunks compile, and also check in the knitted PDF whether all R chunks did *actually* compile, and all images and outputs that you would like to produce have *actually* been generated.  **A picture or a piece of R output which does not exist will give zero marks, even if some parts of the underlying R code would have been correct.**
+
+* Some of the requested analyses requires running R code which is not deterministic. So, you will not have full control over the output that is finally generated in the knitted document. This is fine. It is clear that the methods under investigation carry uncertainty, which is actually part of the problem tackled in this assignment. Your analysis should, however, be robust enough so that it stays in essence correct under repeated execution of your data analysis.  
+
+* We consider a large data set! So, some calculations may take a while, and you will need to be patient. Where code contains loops, it may be a good idea to print the iteration number on the screen so that you know how far the computation has progressed. However, computations should usually not take more than a few minutes, even on an old laptop. So, if a certain computation takes too long, then change your code or methodology, rather than letting your computer struggle for hours!
+
+# Preliminaries
+
+We investigate a dataset introduced in a publication in *Nature* by [Alizadeh (2000)](https://www.researchgate.net/publication/12638392_Distinct_types_of_diffuse_large_B-cell_lymphoma_identified_by_gene_expression_profiling).  This dataset reports gene expression profiles (7399 genes) of 240 patients with B-cell Lymphoma (a tumor that developes from B lymphocytes). The response variable corresponds to patient survival times (in years).  So, this is a truly high-dimensional regression problem, with $p=7399$ predictor variables, but only $n=240$ observations.   
+
+Please use the following steps to read in the data (you may need to install R package `HCmodelSets` first). 
+
+```{r}
+require(HCmodelSets)
+data(LymphomaData)
+?patient.data
+```
+
+A few initial steps need to be carried out to prepare the data for analysis. Executing
+
+```{r}
+names(patient.data)
+dim(patient.data$x)
+```
+
+will tell you that the matrix of predictors is given in the wrong orientation for our purposes. So, let's define
+
+```{r}
+X <- t(patient.data$x)
+colnames(X) <-paste("G", 1:dim(X)[2], sep="")
+
+```
+
+Now, we define the response variable as 
+
+```{r}
+Time <- patient.data$time
+```
+
+
+# Task 1: Exploratory data analysis (10 marks)
+
+Using appropriate graphical tools, carry out some exploratory analysis in order to get a better understanding of the data. For instance, it could be useful to provide a histogram of the response, and a scree plot for a principal component analysis of the predictor space. Additional contributions which are more creative than that are welcome. No explanations or comments are required in this task.
+
+**Answer:**
+
+```{r}
+# ...
+
+"Exploring the response variable"
+
+
+#Histogram of response
+hist(Time) 
+#Mean
+"Mean Time"
+mean(Time)
+
+"STD of Time"
+sd(Time)
+
+
+"sample quantiles of Time"
+quantile(Time)
+
+"Number of missing values in Time"
+sum(is.na(Time))
+```
+
+
+
+```{r}
+"Exploring the Genes (X) variable, Cant explore all as so many so use a random sample of 9 genes"
+""
+xxx <- 1:7399
+ind<-c(sample(xxx,9))
+DataExplorer::plot_histogram(X[,ind], ncol = 3)
+#Mean
+"Mean X"
+colMeans(X[,ind])
+
+"STD of X"
+apply(X[,ind],2,sd)
+
+"sample quantiles of X"
+apply(X[,ind],2,quantile)
+
+"Number of missing values in X"
+sum(is.na(X[,ind]))
+``` 
+
+```{r}
+
+"Scree plot"
+pc.cr <- prcomp(X, scale. = TRUE)
+screeplot(pc.cr, npcs = 8, main = "SCREE plot",type = "lines")
+
+``` 
+
+```{r}
+"Pairs plot of 3 random genes with time"
+xxx <- 1:7399
+ind<-c(sample(xxx,3))
+A = cbind(X[,ind], Time)
+pairs(A)
+```
+
+
+
+
+```{r}
+"Exploring the Status variable"
+
+"Counts of the status:"
+table(patient.data$status)
+``` 
+
+
+
+
+```{r}
+"NOTE I DID SCLAE THE DATA AND RUN THE CELLS BELOW, THE RESULTS DID NOT CHANGE THEREFORE i DID NOT USE SCALING IN THE END"
+
+Unscale <- function(X,OG) {
+  std <- apply(OG, 2, sd)
+  meen <- colMeans(OG)
+  XX <-sweep(X,2,std,`*`)
+  scaled <- sweep(XX, 2, meen, `+`)
+  
+  return(scaled)
+}
+
+Scale <- function(X) {
+  std <- apply(X, 2, sd)
+  meen <- colMeans(X)
+  XX <- sweep(X, 2, meen, `-`)
+  X <-sweep(XX,2,std,"/")
+  return(X)
+}
+
+```
+
+
+
+
+# Task 2: The Lasso (18 marks)
+
+We would like to reduce the dimension of the currently 7399-dimensional space of predictors. To this end, apply initially the (frequentist) LASSO onto this data set, using the R function `glmnet`. The outputs required are 
+
+* the trace plot of the fitted regression coefficients;
+* a graphical illustration of the cross-validation to find $\lambda$.
+
+Provide a short statement interpreting the plots.   
+
+Then, extract and report the value of $\lambda$ which *minimizes* the cross-validation criterion. How many genes are included into the model according to this choice?
+
+**Answer:**
+
+```{r}
+# ...
+
+require(glmnet)
+
+gene.lasso<- glmnet(X, Time, family="gaussian", alpha=1)
+par(mar = c(6,4,4,2))
+plot(gene.lasso, xvar="lambda")
+title("trace plot of the fitted regression coefficients", line = +3)
+
+
+``` 
+
+```{r}
+
+gene.lasso.cv= cv.glmnet(X, Time, alpha=1 )
+par(mfrow=c(1,1), mai=c(0.8,0.8,0.8,0.8), cex.axis=2)
+plot(gene.lasso.cv)
+
+title("MSE againts log(lambda)", line = +3)
+gene.lasso.cv$lambda.min
+
+``` 
+
+
+```{r}
+"Statement"
+""
+"Firstly from the Trace plot we can clearly see as lamdba approaches zero the loss fucntion of the lasso tends to the OLS function. Therefore as lambda grows we get stonger reguilarisation
+The lambda which *minimizes* the cross-validation criterion was a small -ve number (~ -0.7 , dont wont to specify exact value as it changes slighly between runs) therefore we are using
+a fairly strong regularisation.Hinting that we do not need many of these ~7000 genes as there are a small subset of genes that seem to capture a most of the information. This is why we see 
+most of the coefficients tedning towards zero as we approach log(lambda) = 0.I.E most of the genes/features here are not useful/needed.
+
+The MSE vs Lambda allows us to find the best lambda that minismises the MSE using cross validation. So overall we find the best lamda through minimising MSE through CV. We can interprete this result using the trace plot, as at this lamdba on the trace plot we can see how many coefficients are non zero i.e important coefficients that help us predict the response variable (Time). We can even get a rough idea of the magnitude of these coeficients.We can also see from the MSE vs Lambda graph that the number of params needed is roughly between 5-36"
+
+""
+gene.lasso.min_lambda <- gene.lasso.cv$lambda.min
+"lambda that minimises the cross-validation criterion"
+gene.lasso.min_lambda
+
+gene.lasso.coef <- coef(gene.lasso.cv, s="lambda.min")
+apply(gene.lasso.coef, 2, function(c)sum(c!=0))
+
+
+sprintf("The number of parameters is = %d", apply(gene.lasso.coef, 2, function(c)sum(c!=0)))
+
+
+"The names are:"
+as.vector(rownames(gene.lasso.coef)[gene.lasso.coef[,1] != 0])
+
+
+```
+
+# Task 3: Assessing cross-validation resampling uncertainty (20 marks)
+
+We know that the output of the cross-validation routine is not deterministic. To shed further light on this, please carry out a simple experiment. Run the cross-validation and estimation routine for the (frequentist) LASSO 50 times, each time identifying the value of $\lambda$ which minimizes the cross-validation criterion, and each time recording which predictor variables have been selected by the Lasso. When finished, produce a table which lists how often each variable has been included. 
+
+Build a model which includes all variables which have been selected at least 25 (out of 50) times. Refit this model with the selected variables using ordinary least squares. (Benchmark: The value of $R^2$ of this model should not be worse than about 0.45, and your model should not make use of more than ca 25 genes).
+
+Report the names of the selected genes (in terms of the notation defined in the `Preliminaries`) explicitly.
+
+**Answer:**
+
+```{r}
+# ...
+lambda_vals <- c()
+
+row_names <- c()
+
+
+require(glmnet)
+for(i in 1:50){
+
+  gene.lasso.cv= cv.glmnet(X, Time, alpha=1 )
+  
+  gene.lasso.min_lambda <- gene.lasso.cv$lambda.min
+  lambda_vals[i] <- gene.lasso.min_lambda
+  
+  gene.lasso.coef <- coef(gene.lasso.cv, s="lambda.min")
+  z <- as.vector(rownames(gene.lasso.coef)[gene.lasso.coef[,1] != 0])
+  row_names <- c(row_names,z)
+  print(i)
+
+}
+``` 
+
+```{r}
+"All selected params"
+result<- as.data.frame(table(row_names))
+result
+""
+"All Params with counts >= 25"
+data <- result[result[,2] >= 25,] 
+data
+
+Selected_var <- as.vector(data[,1])
+
+
+b <- paste(Selected_var[-1], collapse="+")
+b
+
+gene.lm.fit <- lm(paste("Time~ ",b,sep = "")	, data = as.data.frame(X))
+summary(gene.lm.fit)
+
+"Selected genes:"
+Selected_var[-1]
+```
+
+# Task 4: Diagnostics (15 marks)
+
+Carry out some residual diagnostics for the model fitted at the end of Task 3, and display the results graphically.
+
+Attempt a Box-Cox transformation, and refit the model using the suggested transformation.  Repeat the residual diagnostics, and also consider the value of $R^2$ of the transformed model. Give your judgement on whether you would prefer the original or the transformed model.
+
+**Answer:**
+
+```{r}
+# ...
+par(mfrow=c(1,2), cex=0.6)
+plot(gene.lm.fit$residuals, main = "Residuals before transform")
+plot(gene.lm.fit$fitted, gene.lm.fit$residuals, main = "Residuals vs fitted before transform")
+
+require(MASS)
+boxcox(gene.lm.fit, main = "BoxCox Plot")
+
+"Since lambda = 0 we say y^(lambda) = log(y)"
+
+Trans_fit <- lm(paste("log(Time) ~ ",b,sep = "")	, data = as.data.frame(X))
+summary(Trans_fit)
+
+par(mfrow=c(1,2), cex=0.6)
+plot(Trans_fit$residuals, main = "Residuals after transform")
+plot(Trans_fit$fitted, Trans_fit$residuals, main = "Residuals vs fitted after transform")
+
+
+"Original r squared before transform:"
+summary(gene.lm.fit)$r.squared
+
+""
+"New r squared after transform:"
+summary(Trans_fit)$r.squared
+
+
+"Lets start by looking at the resiual analysis:
+Residuals plot: before and after the transform the residuals look independent due to no pattern.
+Fitted residuals plot: Before the transform clear pattern (trumpet like) which suggests we have violated homoscedasticity
+After the transform we see no such shapes. suggesting the boxcox transform has not violated this. From this I am siding with the teansform, but lets compare r squared values.
+
+From the r squared values we can clearly see the non-transformed model has the best statistic
+
+So from this I have had to look else where for a better answer, the model:
+As we are using ordinary least squares which assumes normality I will have to say I would prefer to use the transform model as it 'garantees' this wont be violated and we can see it fixes the problem of the data violating homoscedasticity, the only caveat is the transform model has a slighly worse r squared stat."
+
+
+
+```
+
+
+
+
+# Task 5: Nonparametric smoothing (15 marks)
+
+In this task we are interested in modelling `Time` through a **single** gene, through a nonparametric, univariate, regression model.
+
+Firstly, based on previous analysis, choose a gene which you deem suitable for this task. Provide a scatterplot of the `Time` (vertical) versus  the expression values of that gene (horizontal).
+
+Identify a nonparametric smoother of your choice to carry out this task.  Based on visual inspection, or trial and error, determine a smoothing parameter which appears suitable, and add the resulting fitted curve to the scatterplot.
+
+**Answer:**
+
+
+```{r}
+# ...
+require(KernSmooth)
+
+"I will pick one of the genes that has the lowest p value as it is likey a significant gene/feature for predicing the Response."
+
+pvals<-summary(gene.lm.fit)$coef[-1,4]
+geness<- which.min(pvals)
+
+best.gene<-names(geness)
+
+sprintf("The gene I chose is: %s", best.gene)
+
+plot(X[,best.gene], Time, main = "Time vs best gene (G4248) fitted with locpoly")
+
+
+
+h <- 0.5
+"Through trial and error I found h is roughly:"
+h
+
+
+
+fossil.loc <- locpoly(X[,best.gene], Time, bandwidth=h)
+lines(fossil.loc, col=2)
+
+
+
+```
+
+
+
+
+# Task 6: Bootstrap confidence intervals (22 marks)
+
+Continuing from Task 5 (with the same, single, predictor variable, and the same response `Time`), proceed with a more systematic analysis. Specifically, produce a nonparametric smoother featuring
+
+ * a principled way to select the smoothing parameter;
+ * bootstrapped confidence bands.
+
+The smoothing method that you use in this Task may be the same or a different one as used in Task 5, but you are *not* allowed to make use of R function `gam`. If you use any built-in R functions to select the smoothing parameter or carry out the bootstrap, explain briefly what they do.
+
+Produce a plot which displays the fitted smoother with the bootstrapped confidence bands. Add to this plot the regression line of a simple linear model with the only predictor variable being the chosen gene (beside the intercept). 
+
+Finally, report the values of $R^2$ of both the nonparametric and the parametric model.  Conclude with a statement on the usefulness of the nonparametric model.
+
+**Answer:**
+
+```{r}
+# ...
+
+smooth.loc<- function(x,y,xgrid=x, h){
+  N<-length(xgrid)
+  smooth.est<-rep(0,N)
+  
+  for (j in 1:N){
+    
+    smooth.est[j]<- lm(y~I(x-xgrid[j]),
+    weights=dnorm(x,xgrid[j],h) )$coef[1]
+  }
+  
+  list(x= xgrid, fit=smooth.est)
+}
+
+h <- dpill(X[,best.gene], Time, truncate=FALSE)
+Gene.loc <- smooth.loc(X[,best.gene], Time, h=h)
+
+
+Gene.res <- Time - Gene.loc$fit
+boot.fit <- matrix(0,200,dim(patient.data$x)[2])
+
+for (j in 1:200){
+  boot.res <- sample(Gene.res, size=dim(patient.data$x)[2])
+  new.y <- Gene.loc$fit +boot.res
+  
+  ##### h selection
+  h <- dpill(X[,best.gene], new.y, truncate=FALSE)
+  
+  boot.fit[j,] <- smooth.loc(X[,best.gene], new.y, h=h)$fit
+}
+
+lower<-upper<- rep(0,dim(patient.data$x)[2])
+for (i in 1:dim(patient.data$x)[2]){
+  lower[i]<-quantile(boot.fit[,i],0.025)
+  upper[i]<-quantile(boot.fit[,i],0.975)
+}
+
+plot(X[,best.gene], Time, main = "Time vs best gene (G4248) using nonparametric smoother and confidence bands")
+for (j in 1:200){ lines(X[,best.gene][order(X[,best.gene])], boot.fit[j,][order(X[,best.gene])], col="grey")}
+lines(X[,best.gene][order(X[,best.gene])], Gene.loc$fit[order(X[,best.gene])])
+lines(X[,best.gene][order(X[,best.gene])], upper[order(X[,best.gene])], col=2, lwd=3)
+lines(X[,best.gene][order(X[,best.gene])], lower[order(X[,best.gene])], col=2, lwd=3)
+
+tt<-lm(Time ~ X[,best.gene], data = as.data.frame(X))
+
+
+abline(tt, col=5, lwd=2)
+"R squared of parametric model"
+summary(tt)$r.squared
+""
+"R squared of non-parametric model"
+rr<- 1-(sum((Time-Gene.loc$fit)^2))/(sum((Time-mean(Time))^2))
+rr
+
+
+"statement on the usefulness of the nonparametric model:
+As you can see the non parametric model had a better r squared and therfore fitted the data better, non parametric models are also very useful as they usaully rquire less tuning in terms of hyperparamters. They are also a very general model which can be used in manyu applications.In this case they out performed the paramteric models making them very useful and easy to use! However only uing one of the genes to predict our response is not useful in either case and we get very poor r squared values."
+
+"I used the dpill to select my smoothing paramter, This simply finds the bandwidth h which minimises the integrated asymptotic mean squared error where h ~ n^-1/5"
+
+
+
+```
+

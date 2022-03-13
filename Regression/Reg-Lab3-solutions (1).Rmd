@@ -1,0 +1,248 @@
+---
+title: "ASML Regression, Computer Lab 3"
+author: "Jochen Einbeck"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+
+
+# Preliminaries
+
+Consider again the data set on real estate prizes extracted from  [kaggle](https://www.kaggle.com/quantbruce/real-estate-price-prediction/).
+
+You can read in the data via
+
+```{r}
+realestate<- read.csv("http://www.maths.dur.ac.uk/~dma0je/Data/Realestate.csv", header=TRUE)
+```
+
+We do the same simplifications of long variable names as in the last practicals:
+
+```{r}
+colnames(realestate)[8]<- "Y"
+colnames(realestate)[5]<- "X4.stores"
+colnames(realestate)[4] <- "X3.MRT"
+```
+
+Reproduce the frequentist ridge regression estimation using `glmnet` from the second worksheet, and display the coefficient estimates  (`real.ridge.coef`) minimizing the cross-validation criterion.
+
+```{r}
+require(glmnet)
+realX <- as.matrix(realestate[,2:7])
+real.ridge.cv=  cv.glmnet(realX, realestate$Y, alpha=0 )
+real.ridge.coef<- coef(real.ridge.cv, s="lambda.min")[,1]
+real.ridge.coef
+```
+
+# Bayesian ridge regression
+
+Use now Jags to implement a Bayesian version of ridge regression. It is advised to use again scaled predictors for this purpose. 
+
+*Note*: The only actual difference to the Jags implementation for usual multiple linear regression is that the prior precision of the `beta[j]` is now `tau*lambda`, for some fixed ridge parameter `lambda` for which you can assign an arbitrary value, such as 25, to start with.  Of course,at this stage, we do not know which values of $\lambda$ are good or bad, so any other value (rather than 25) could be taken here.  The value 25 was a one-shot guess resulting in estimates that are close to those from the frequentist ridge estimator.
+
+```{r}
+# Means and sd.'s
+m <- apply(realX, 2,mean)
+S <- apply(realX, 2, sd)
+
+# This is the actual scaling step:
+SrealX<-scale(realX)
+
+# Check:
+apply(SrealX, 2, mean)
+apply(SrealX,2,sd)
+
+```
+
+
+```{r}
+model4_string <- "model{
+  for(i in 1:N){ 
+    y[i] ~ dnorm(mu[i], tau)   # tau = precision=inverse variance
+    mu[i] <- beta0+beta%*%X[i,]
+  } 
+  # Prior distribution on mean
+    beta0 ~ dnorm(0, 0.01);    
+    for (j in 1:6){
+      beta[j]~  dnorm(0, tau*lambda)
+    }
+    tau  ~ dgamma(0.01, 0.01)
+    sigma<- 1/sqrt(tau)
+    lambda=25
+   
+}"
+
+```
+
+Execute the actual MCMC sampling and the collection of posterior samples as usual:
+
+```{r}
+require(rjags)
+model4 <- jags.model(textConnection(model4_string), 
+          data = list(X=SrealX, y=realestate$Y,N=dim(realX)[1]))
+
+update(model4, 10000)
+
+postmod4.samples = coda.samples(model4, c("beta0", "beta", "tau"), 10000)[[1]]
+
+summary(postmod4.samples)
+
+```
+
+These need again be un-scaled. Compare the posterior mean estimates directly with the frequentist ridge estimates.
+
+```{r}
+
+rbind(
+real.ridge.coef[2:7],  
+rowMeans(t(postmod4.samples[,1:6])/S)
+)
+```
+
+Now, modify your code to give a suitable prior to $\lambda$, and estimate it alongside the other model parameters in Jags.
+
+```{r}
+model5_string <- "model{
+  for(i in 1:N){ 
+    y[i] ~ dnorm(mu[i], tau)   # tau = precision=inverse variance
+    mu[i] <- beta0+beta%*%X[i,]
+  } 
+  # Prior distribution on mean
+    beta0 ~ dnorm(0, 0.01);    
+    for (j in 1:6){
+      beta[j]~  dnorm(0, tau*lambda)
+    }
+    tau  ~ dgamma(0.01, 0.01)
+    sigma<- 1/sqrt(tau)
+    lambda ~ dgamma(5,1/5)
+   
+}"
+
+```
+
+Here we are using a prior distribution for $\lambda$. Note that the expectation of a Gamma distribution with parameters (5,1/5) is just 25; so our choice of prior is informed by our fixed choice of $\lambda$ above. But, we are allowing for a large variance of 5/(1/25)=125.
+Of course, other priors may be used, and it is an interesting exercise to observe the sensitivity of the results to this choice.
+
+
+```{r}
+require(rjags)
+model5 <- jags.model(textConnection(model5_string), 
+          data = list(X=SrealX, y=realestate$Y,N=dim(realX)[1]))
+
+update(model5, 10000)
+
+postmod5.samples = coda.samples(model5, c("beta0", "beta", "tau", "lambda"), 10000)[[1]]
+
+summary(postmod5.samples)
+
+```
+
+Visualize the sampled posterior distributions using `plot`:
+
+```{r}
+# plot(postmod5.samples)
+```
+
+Compare the posterior mean estimates again to previously fitted models, and summarize conclusions.
+
+```{r}
+rbind(
+real.ridge.coef[2:7],  
+rowMeans(t(postmod5.samples[,1:6])/S)
+)
+```
+
+Again, we see a similar effect for the frequentist and the Bayesian ridge regression, with the latter now providing a posterior median estimate for lambda at about 13. It appears that parametrizations used in `glmnet` and `rjags` are not the same (that is, a value of magnitude $\lambda\approx 10$ in `rjags` corresponds to $\lambda \approx 1$ in `glmnet` );  the way that the intercept and the scaling are being dealt with in both approaches is probably playing  an additional role.
+
+
+## Smoothing - Lidar data
+
+We consider a data set with 221 observations from a a light detection and ranging (LIDAR) experiment. Please use the following code to read in, and display the data. Also read the help file. 
+
+```{r}
+require(SemiPar)
+data(lidar)
+plot(lidar)
+# help(lidar)
+```
+
+It is sometimes useful to "attach" an object to our workspace, so that we can directly access its components. Here this is the case, so let's do this:
+
+```{r}
+attach(lidar)
+```
+
+Identify a suitable bandwidth "by eye", and fit a local smoother to the data using locpoly:
+
+```{r}
+require(KernSmooth)
+lidar.loc <- locpoly(range, logratio, bandwidth=50)
+names(lidar.loc)
+plot(range, logratio)
+lines(lidar.loc, col=2)
+```
+
+Adjust your bandwidth used above until the curve fits adequately through the data:
+
+```{r}
+lidar.loc2 <- locpoly(range, logratio, bandwidth=20)
+plot(range, logratio)
+lines(lidar.loc2, col=2)
+```
+
+Now, consider the use of smoothing splines, using function `sm.spline`, with its default options (Slide 6).
+
+```{r}
+require(pspline)
+lidar.spline <-  sm.spline(range,  logratio)
+```
+
+Display the fitted smooth curve.
+
+```{r}
+plot(range, logratio)
+lines(lidar.spline$x, lidar.spline$ysmth, col=2, lwd=2)
+```
+
+Inspect the fitted object `lidar.spline` (by simply `print`ing it).
+
+```{r}
+print(lidar.spline)
+```
+
+This gives a few useful pieces of information (that we did not get for `locpoply`). Specifically,
+
+* "Smoothing Parameter": This is the analogue to our bandwidth (with this smoothing technique, it is a penalty parameter, $\lambda$). 
+* Equivalent degree of freedom, is the number of parameters that one would need to fit a parametric model of similar flexibility. This corresponds to the trace of the smoother matrix (see Slide 19).
+* CV Criterion. Value of $CV(\lambda)$ after completion of cross-validation (see Slide 19).
+* GCV Criterion. Value of $GCV(\lambda)$  after completion of generalized cross-validation. This is a quicker variant of cross-validation where $\ell_{ii}$ in the denominator is replaced by $\frac{1}{n}\sum \ell_{ii}$. 
+
+*Task*: Find out whether CV or GCV has been used. In either case, re-fit the curve using the other, and compare results.
+
+```{r}
+# sm.spline(x, y, w, cv=FALSE, ...), so GCV had been used.
+lidar.spline2 <-  sm.spline(range,  logratio, cv=TRUE)
+print(lidar.spline2)
+plot(range, logratio)
+lines(lidar.spline$x, lidar.spline$ysmth, col=2, lwd=1)
+lines(lidar.spline2$x, lidar.spline2$ysmth, col=3, lwd=1)
+```
+
+Finally, produce a `family plot' over a suitable range of smoothing parameters (Slide 24), using either kernels or smoothing splines. 
+
+```{r}
+lid.fam.fit<-matrix(0,50,401)
+h<-seq(2,50, by=2)
+for (j in 1:25){
+  lid.fam.fit[j,]<-locpoly(range, logratio,
+     bandwidth=h[j])$y
+}
+
+plot(range, logratio)
+for (j in 1:25){
+  lines(lidar.loc$x, lid.fam.fit[j,], col="grey50")
+}
+```
+
